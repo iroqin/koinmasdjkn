@@ -53,8 +53,8 @@
             width: 95%; max-width: 1200px; background: #ffffff; border-radius: 8px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 30px;
         }
-        /* Penyesuaian lebar area scroll untuk 7 node per baris */
-        .timeline-scroll-area { padding: 40px 80px; min-width: 1300px; box-sizing: border-box; }
+        /* Padding dan min-width dikurangi agar pas di layar laptop tanpa scroll */
+        .timeline-scroll-area { padding: 40px 20px; min-width: 1170px; box-sizing: border-box; }
         .timeline-canvas { position: relative; width: 1150px; height: 320px; margin: 0 auto; }
         .timeline-row { display: flex; justify-content: space-between; position: absolute; width: 1150px; left: 0; z-index: 2; }
         
