@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline KOIN MAS DJKN 2026/2027</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        .header {
+            background-color: #002B5B;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            color: #F9A826;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 { margin: 0; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+        .header p { margin: 2px 0 0 0; font-size: 12px; color: #ffffff; }
+
+        .btn-back {
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            color: #ffffff; text-decoration: none; font-size: 13px; border: 1px solid #ffffff;
+            padding: 6px 12px; border-radius: 4px; transition: 0.2s; background: transparent;
+        }
+        .btn-back:hover { background-color: #F9A826; color: #002B5B; border-color: #F9A826; }
+
+        /* --- Panel Informasi --- */
+        .info-panel {
+            background: #ffffff; width: 90%; max-width: 800px; margin: 25px 0;
+            padding: 20px; border-radius: 8px; border-top: 4px solid #F9A826;
+            text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .info-panel h2 { margin: 0 0 12px 0; color: #002B5B; font-size: 20px; }
+        .status-box { display: inline-block; background: #f0f2f5; padding: 8px 18px; border-radius: 20px; font-size: 14px; border: 1px solid #e0e0e0; }
+        .status-value { color: #002B5B; font-weight: bold; }
+
+        /* --- Wadah Linimasa --- */
+        .timeline-card {
+            width: 95%; max-width: 1200px; background: #ffffff; border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 30px;
+        }
+        /* Penyesuaian lebar area scroll untuk 7 node per baris */
+        .timeline-scroll-area { padding: 40px 80px; min-width: 1300px; box-sizing: border-box; }
+        .timeline-canvas { position: relative; width: 1150px; height: 320px; margin: 0 auto; }
+        .timeline-row { display: flex; justify-content: space-between; position: absolute; width: 1150px; left: 0; z-index: 2; }
+        
+        .row-2025 { top: 0; } .row-2026 { top: 132px; }
+        .timeline-item { width: 120px; text-align: center; }
+        .date { height: 40px; display: flex; align-items: flex-end; justify-content: center; font-size: 11px; font-weight: bold; color: #002B5B; margin-bottom: 10px; }
+        .node { width: 16px; height: 16px; background: #F9A826; border: 4px solid #002B5B; border-radius: 50%; margin: 0 auto; position: relative; z-index: 3; box-sizing: border-box; transition: 0.3s; }
+        .node.active { transform: scale(1.6); box-shadow: 0 0 0 5px rgba(249, 168, 38, 0.2); background: #002B5B; border-color: #F9A826; }
+        .desc { font-size: 11px; color: #555555; margin-top: 15px; line-height: 1.4; }
+
+        /* --- Geometri Garis Linimasa Presisi --- */
+        .line-row-1 { position: absolute; top: 56px; left: 60px; width: 1030px; height: 4px; background: #002B5B; z-index: 1; }
+        .line-row-2 { position: absolute; top: 188px; left: 60px; width: 1030px; height: 4px; background: #002B5B; z-index: 1; }
+        .ext-right { position: absolute; top: 56px; left: 1090px; width: 30px; height: 4px; background: #002B5B; z-index: 1; }
+        .curve-right { position: absolute; top: 56px; left: 1120px; width: 35px; height: 70px; border: 4px solid #002B5B; border-left: none; border-radius: 0 35px 35px 0; box-sizing: border-box; }
+        .mid-line { position: absolute; top: 122px; left: 30px; width: 1090px; height: 4px; background: #002B5B; z-index: 1; }
+        .curve-left { position: absolute; top: 122px; left: -5px; width: 35px; height: 70px; border: 4px solid #002B5B; border-right: none; border-radius: 35px 0 0 35px; box-sizing: border-box; }
+        .ext-left { position: absolute; top: 188px; left: 30px; width: 30px; height: 4px; background: #002B5B; z-index: 1; }
+        .year-bg { position: absolute; font-size: 60px; font-weight: 900; color: rgba(0, 43, 91, 0.08); z-index: 0; pointer-events: none; left: 20px; }
+
+        /* --- Custom Buttons Bawah --- */
+        .custom-buttons-container {
+            width: 95%; max-width: 1200px; margin-bottom: 50px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
+        }
+        .custom-btn {
+            background-color: #ffffff; border-left: 5px solid #F9A826; padding: 20px;
+            border-radius: 6px; text-decoration: none; color: #002B5B; font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; display: flex; align-items: center; justify-content: space-between;
+        }
+        .custom-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); background-color: #fafbfc; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="index.html" class="btn-back">&#8592; Kembali</a>
+        <h1>PORTAL KOIN MAS DJKN</h1>
+        <p>Kementerian Keuangan Republik Indonesia</p>
+    </div>
+
+    <div class="info-panel">
+        <h2>KOIN MAS DJKN 2026/2027</h2>
+        <div class="status-box">
+            <span style="color: #666;">Kegiatan Saat Ini:</span>
+            <span class="status-value" id="current-task">Mengecek Jadwal...</span>
+        </div>
+    </div>
+
+    <div class="timeline-card">
+        <div class="timeline-scroll-area">
+            <div class="timeline-canvas">
+                
+                <div class="year-bg" style="top: -20px;">2026</div>
+                <div class="year-bg" style="top: 110px;">2027</div>
+
+                <div class="line-row-1"></div><div class="ext-right"></div><div class="curve-right"></div>
+                <div class="mid-line"></div><div class="curve-left"></div><div class="ext-left"></div><div class="line-row-2"></div>
+
+                <div class="timeline-row row-2025">
+                    <div class="timeline-item"><div class="date">20 APR</div><div class="node" id="node-0"></div><div class="desc">Kickoff & Publikasi</div></div>
+                    <div class="timeline-item"><div class="date">20 APR - 12 JUN</div><div class="node" id="node-1"></div><div class="desc">Pengumpulan Proposal Optimalisasi</div></div>
+                    <div class="timeline-item"><div class="date">26 JUNI</div><div class="node" id="node-2"></div><div class="desc">Hasil Seleksi Administrasi</div></div>
+                    <div class="timeline-item"><div class="date">JUL - NOV</div><div class="node" id="node-3"></div><div class="desc">Penyampaian Laporan Bulanan</div></div>
+                    <div class="timeline-item"><div class="date">10 DES</div><div class="node" id="node-4"></div><div class="desc">Laporan Progress Optimalisasi</div></div>
+                    <div class="timeline-item"><div class="date">17 DES</div><div class="node" id="node-5"></div><div class="desc">Video Progress Optimalisasi</div></div>
+                    <div class="timeline-item"><div class="date">AKHIR DES</div><div class="node" id="node-6"></div><div class="desc">Pengumuman 10 Besar</div></div>
+                </div>
+
+                <div class="timeline-row row-2026">
+                    <div class="timeline-item"><div class="date">JAN - JUNI</div><div class="node" id="node-7"></div><div class="desc">Laporan Bulanan Babak 10 Besar</div></div>
+                    <div class="timeline-item"><div class="date">10 JULI</div><div class="node" id="node-8"></div><div class="desc">Penyampaian Laporan Akhir</div></div>
+                    <div class="timeline-item"><div class="date">16 JULI</div><div class="node" id="node-9"></div><div class="desc">Penyampaian Video Akhir</div></div>
+                    <div class="timeline-item"><div class="date">AWAL AGU</div><div class="node" id="node-10"></div><div class="desc">Pengumuman 5 Besar</div></div>
+                    <div class="timeline-item"><div class="date">AGU - SEPT</div><div class="node" id="node-11"></div><div class="desc">Kunjungan Lapangan</div></div>
+                    <div class="timeline-item"><div class="date">AKHIR SEPT</div><div class="node" id="node-12"></div><div class="desc">Pengumuman Finalis & Inovasi</div></div>
+                    <div class="timeline-item"><div class="date">OKTOBER</div><div class="node" id="node-13"></div><div class="desc">Pelaksanaan Grand Final</div></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="custom-buttons-container">
+        
+        <a href="#" class="custom-btn" target="_blank">
+            <span>Dashboard</span> <span>&#8594;</span>
+        </a>
+
+        <a href="https://kemenkeu-my.sharepoint.com/:f:/r/personal/ivan_rifqi_kemenkeu_go_id/Documents/KOIN%20MAS%20DJKN/KOIN%20MAS%202627?csf=1&web=1&e=OmrDER" class="custom-btn" target="_blank">
+            <span>Administrasi Internal</span> <span>&#8594;</span>
+        </a>
+
+        <a href="#" class="custom-btn" target="_blank">
+            <span>N/A</span> <span>&#8594;</span>
+        </a>
+
+        <a href="#" class="custom-btn" target="_blank">
+            <span>N/A</span> <span>&#8594;</span>
+        </a>
+
+    </div>
+    <script>
+        // Logika Linimasa Periode 2026/2027
+        const events = [
+            { id: 0, text: "Kickoff dan Publikasi", start: new Date(2026, 3, 20), end: new Date(2026, 3, 20, 23, 59) },
+            { id: 1, text: "Pengumpulan Proposal Optimalisasi", start: new Date(2026, 3, 21), end: new Date(2026, 5, 12, 23, 59) },
+            { id: 2, text: "Pengumuman Hasil Seleksi Administrasi", start: new Date(2026, 5, 26), end: new Date(2026, 5, 26, 23, 59) },
+            { id: 3, text: "Penyampaian Laporan Bulanan", start: new Date(2026, 6, 1), end: new Date(2026, 10, 30, 23, 59) },
+            { id: 4, text: "Penyampaian Laporan Progress Optimalisasi", start: new Date(2026, 11, 10), end: new Date(2026, 11, 10, 23, 59) },
+            { id: 5, text: "Penyampaian Video Progress Optimalisasi", start: new Date(2026, 11, 17), end: new Date(2026, 11, 17, 23, 59) },
+            { id: 6, text: "Pengumuman 10 Besar", start: new Date(2026, 11, 18), end: new Date(2026, 11, 31, 23, 59) },
+            { id: 7, text: "Penyampaian Laporan Bulanan Babak 10 Besar", start: new Date(2027, 0, 1), end: new Date(2027, 5, 30, 23, 59) },
+            { id: 8, text: "Penyampaian Laporan Akhir", start: new Date(2027, 6, 10), end: new Date(2027, 6, 10, 23, 59) },
+            { id: 9, text: "Penyampaian Video Akhir Optimalisasi", start: new Date(2027, 6, 16), end: new Date(2027, 6, 16, 23, 59) },
+            { id: 10, text: "Pengumuman 5 Besar", start: new Date(2027, 7, 1), end: new Date(2027, 7, 10, 23, 59) },
+            { id: 11, text: "Kunjungan Lapangan", start: new Date(2027, 7, 11), end: new Date(2027, 8, 20, 23, 59) },
+            { id: 12, text: "Pengumuman Finalis & Inovasi", start: new Date(2027, 8, 21), end: new Date(2027, 8, 30, 23, 59) },
+            { id: 13, text: "Pelaksanaan Grand Final", start: new Date(2027, 9, 1), end: new Date(2027, 9, 31, 23, 59) }
+        ];
+
+        const today = new Date();
+        let currentTaskText = "Tidak Ada Kegiatan Aktif";
+        let activeId = -1;
+
+        for (let e of events) {
+            if (today >= e.start && today <= e.end) {
+                currentTaskText = e.text;
+                activeId = e.id;
+                break;
+            } else if (today < e.start) {
+                currentTaskText = "Persiapan: " + e.text;
+                activeId = e.id;
+                break;
+            }
+        }
+
+        document.getElementById('current-task').innerText = currentTaskText;
+        if (activeId !== -1) {
+            const activeNode = document.getElementById('node-' + activeId);
+            if(activeNode) activeNode.classList.add('active');
+        }
+    </script>
+</body>
+</html>
